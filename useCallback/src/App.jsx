@@ -1,11 +1,11 @@
 import './App.css'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import ChildComponent from './components/ChildComponent';
 
 function App() {
   const [count, setCount] = useState(0);
 
-  const OnClick = () => setCount(count + 1);
+  const OnClick = useCallback(() => setCount(count + 1), [])
   return (
     <div className="App">
       <div className="card">
