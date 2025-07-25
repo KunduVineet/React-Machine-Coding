@@ -4,6 +4,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
     const [jwt, setJwt] = useState("");
+    const [profile, setProfile] = useState(null);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -21,6 +22,7 @@ const Login = () => {
                 console.log(data);
                 setJwt(data.jwtToken);
                 setMessage("Login successful!");
+                fetchUserProfile(data.jwtToken);
             } else {
                 setMessage(data.message || "Login failed.");
             }
@@ -28,6 +30,26 @@ const Login = () => {
             setMessage("An error occurred: " + error.message);
         }
     }
+
+    const fetchUserProfile = async (jwtToken) => {
+        try {
+            const response = await fetch("http://localhost:8080/api/profile", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${jwtToken}`
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setProfile(data);
+            } else {
+                setMessage(data.message || "Failed to fetch profile.");
+            }
+        } catch (error) {
+            setMessage("An error occurred: " + error.message);
+        }
+    }
+
     return (
         <div className="login-container">
             <h2>Login</h2>
@@ -56,6 +78,15 @@ const Login = () => {
             </form>
             {message && <p>{message}</p>}
             {jwt && <p>Your JWT: {jwt}</p>}
+
+            {profile && (
+                <div className="profile">
+                    <h3>User Profile</h3>
+                    <p><strong>Username:</strong> {profile.username}</p>
+                    <p><strong>Email:</strong> {profile.email}</p>
+                    <p><strong>Roles:</strong> {profile.roles.join(", ")}</p>
+                </div>
+            )}
         </div>
     );
 }
